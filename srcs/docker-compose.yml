@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  mariadb:
+    build: ./srcs/mariadb # Builds the Docker image for the MariaDB service using the Dockerfile located in the ./srcs/mariadb directory.
+    container_name: mariadb # Sets the name of the container to "mariadb" for easier identification.
+    restart: always # Automatically restart the container if it stops.
+    environment: # Sets environment variables for the MariaDB service using values from a .env file or the host environment.
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes: # Persists MariaDB data on the host machine to ensure data is not lost when the container is removed.
+      - mariadb_data:/var/lib/mysql
+    networks: # Connects the MariaDB service to the specified network.
+      - inception_network
+
+
+  wordpress:
+    build: ./srcs/wordpress
+    container_name: wordpress
+    restart: always
+    depends_on: #" Ensures that the MariaDB service is started before the WordPress service.
+      - mariadb
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_URL: ${DOMAIN_NAME}
+      WORDPRESS_TITLE: ${WORDPRESS_TITLE}
+      WORDPRESS_ADMIN_USER: ${WORDPRESS_ADMIN_USER}
+      WORDPRESS_ADMIN_PASSWORD: ${WORDPRESS_ADMIN_PASSWORD}
+      WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL}
+      WORDPRESS_USER: ${WORDPRESS_USER}
+      WORDPRESS_USER_EMAIL: ${WORDPRESS_USER_EMAIL}
+      WORDPRESS_USER_PASSWORD: ${WORDPRESS_USER_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception_network
+
+  nginx:
+    build: ./srcs/nginx
+    container_name: nginx
+    restart: always
+    depends_on:
+      - wordpress
+    ports: # Maps port 443 on the host to port 443 in the container for HTTPS traffic.
+      - "443:443"
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+    volumes:
+      - wordpress_data:/var/www/html
+      - nginx_ssl:/etc/nginx/ssl
+    networks:
+      inception_network:
+        aliases:
+          - musozer.42.fr
+
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/wordpress
+  nginx_ssl:
+    driver: local
+
+networks:
+  inception_network:
+    driver: bridge
