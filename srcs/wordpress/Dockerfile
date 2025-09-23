@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y \
 
 # Configure PHP-FPM
 RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/' /etc/php/8.2/fpm/pool.d/www.conf && \
-    sed -i 's/;listen.allowed_clients = 127.0.0.1/listen.allowed_clients = 127.0.0.1/' /etc/php/8.2/fpm/pool.d/www.conf && \
     sed -i 's/;clear_env = no/clear_env = no/' /etc/php/8.2/fpm/pool.d/www.conf
 
 # Create PHP-FPM run directory
@@ -29,7 +28,7 @@ RUN mkdir -p /run/php && \
     chown -R www-data:www-data /run/php
 
 # Download and install WP-CLI
-RUN curl -O https://raw.githubusercontent.com/wp-cli/wp-cli/v2.8.1/phar/wp-cli.phar && \
+RUN curl -L https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp
 

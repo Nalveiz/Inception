@@ -3,10 +3,12 @@
 echo "Starting WordPress setup..."
 
 # Wait for database to be ready
-echo "Waiting for database connection..."
-while ! mysqladmin ping -h"$WORDPRESS_DB_HOST" -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" --silent; do
-    sleep 1
+echo "Waiting for database to be ready..."
+until mysql -h"$WORDPRESS_DB_HOST" -P3306 -u"$WORDPRESS_DB_USER" -p"$WORDPRESS_DB_PASSWORD" -e "SELECT 1;" > /dev/null 2>&1; do
+    echo "Database not ready, waiting..."
+    sleep 2
 done
+
 echo "Database is ready!"
 
 # Download WordPress
@@ -18,11 +20,6 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     curl -O https://wordpress.org/latest.tar.gz
     tar -xzf latest.tar.gz --strip-components=1
     rm latest.tar.gz
-
-    # Download WP-CLI with a more reliable method
-    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-    chmod +x wp-cli.phar
-    mv wp-cli.phar /usr/local/bin/wp
 
     # Create wp-config.php
     echo "Creating wp-config.php..."

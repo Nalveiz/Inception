@@ -14,15 +14,22 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - inception_network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -p$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   wordpress:
     build: ./wordpress
     container_name: wordpress
     restart: always
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     environment:
-      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
       WORDPRESS_DB_USER: ${MYSQL_USER}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
