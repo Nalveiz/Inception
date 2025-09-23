@@ -18,12 +18,12 @@ down:
 
 clean: down
 	@echo "Cleaning Docker system..."
-	@docker system prune -af
-	@docker volume prune -f
+	@sudo docker system prune -af
+	@sudo docker volume prune -f
 
 fclean: clean
 	@echo "Removing all host data..."
-	@rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress || true
+	@sudo rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress || true
 
 purge:
 	@echo "🚨 Purging ALL Docker containers, volumes, networks, and images..."
