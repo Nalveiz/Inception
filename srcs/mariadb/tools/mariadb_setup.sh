@@ -2,11 +2,16 @@
 
 echo "Starting MariaDB setup..."
 
+# Ensure necessary directories exist with correct permissions
+mkdir -p /var/run/mysqld /var/log/mysql
+chown -R mysql:mysql /var/run/mysqld /var/log/mysql /var/lib/mysql
+chmod 755 /var/run/mysqld /var/log/mysql
+
 # Initialize database if it doesn't exist
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "Initializing MariaDB database..."
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
-    
+
     # Start MariaDB temporarily for setup
     mysqld --user=mysql --bootstrap --verbose=0 --skip-name-resolve --skip-networking=0 << EOF
 USE mysql;
@@ -21,7 +26,7 @@ CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 EOF
-    
+
     echo "Database initialization completed!"
 fi
 

@@ -2,25 +2,24 @@ version: '3.8'
 
 services:
   mariadb:
-    build: ./srcs/mariadb # Builds the Docker image for the MariaDB service using the Dockerfile located in the ./srcs/mariadb directory.
-    container_name: mariadb # Sets the name of the container to "mariadb" for easier identification.
-    restart: always # Automatically restart the container if it stops.
-    environment: # Sets environment variables for the MariaDB service using values from a .env file or the host environment.
+    build: ./mariadb
+    container_name: mariadb
+    restart: always
+    environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes: # Persists MariaDB data on the host machine to ensure data is not lost when the container is removed.
+    volumes:
       - mariadb_data:/var/lib/mysql
-    networks: # Connects the MariaDB service to the specified network.
+    networks:
       - inception_network
 
-
   wordpress:
-    build: ./srcs/wordpress
+    build: ./wordpress
     container_name: wordpress
     restart: always
-    depends_on: #" Ensures that the MariaDB service is started before the WordPress service.
+    depends_on:
       - mariadb
     environment:
       WORDPRESS_DB_HOST: mariadb
@@ -41,12 +40,12 @@ services:
       - inception_network
 
   nginx:
-    build: ./srcs/nginx
+    build: ./nginx
     container_name: nginx
     restart: always
     depends_on:
       - wordpress
-    ports: # Maps port 443 on the host to port 443 in the container for HTTPS traffic.
+    ports:
       - "443:443"
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}

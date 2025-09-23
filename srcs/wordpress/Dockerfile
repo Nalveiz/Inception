@@ -1,18 +1,18 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 # Install PHP-FPM, PHP extensions, and other dependencies
 RUN apt-get update && apt-get install -y \
-    php7.4-fpm \
-    php7.4-mysql \
-    php7.4-curl \
-    php7.4-gd \
-    php7.4-mbstring \
-    php7.4-xml \
-    php7.4-xmlrpc \
-    php7.4-soap \
-    php7.4-intl \
-    php7.4-zip \
-    php7.4-cli \
+    php8.2-fpm \
+    php8.2-mysql \
+    php8.2-curl \
+    php8.2-gd \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-xmlrpc \
+    php8.2-soap \
+    php8.2-intl \
+    php8.2-zip \
+    php8.2-cli \
     curl \
     wget \
     unzip \
@@ -20,9 +20,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure PHP-FPM
-RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/' /etc/php/7.4/fpm/pool.d/www.conf && \
-    sed -i 's/;listen.allowed_clients = 127.0.0.1/listen.allowed_clients = 127.0.0.1/' /etc/php/7.4/fpm/pool.d/www.conf && \
-    sed -i 's/;clear_env = no/clear_env = no/' /etc/php/7.4/fpm/pool.d/www.conf
+RUN sed -i 's/listen = \/run\/php\/php8.2-fpm.sock/listen = 9000/' /etc/php/8.2/fpm/pool.d/www.conf && \
+    sed -i 's/;listen.allowed_clients = 127.0.0.1/listen.allowed_clients = 127.0.0.1/' /etc/php/8.2/fpm/pool.d/www.conf && \
+    sed -i 's/;clear_env = no/clear_env = no/' /etc/php/8.2/fpm/pool.d/www.conf
 
 # Create PHP-FPM run directory
 RUN mkdir -p /run/php && \

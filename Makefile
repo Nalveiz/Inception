@@ -25,12 +25,15 @@ fclean: clean
 	@echo "Removing all host data..."
 	@rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress || true
 
+purge:
+	@echo "🚨 Purging ALL Docker containers, volumes, networks, and images..."
+	@docker rm -f $$(docker ps -aq) 2>/dev/null || true
+	@docker volume rm -f $$(docker volume ls -q) 2>/dev/null || true
+	@docker network rm $$(docker network ls -q) 2>/dev/null || true
+	@docker rmi -f $$(docker images -q) 2>/dev/null || true
+	@echo "✅ Docker environment fully cleaned!"
+
+
 re: fclean all
 
-logs:
-	@$(COMPOSE) logs -f
-
-ps:
-	@$(COMPOSE) ps
-
-.PHONY: all build up down clean fclean re logs ps
+.PHONY: all build up down clean fclean  purge re

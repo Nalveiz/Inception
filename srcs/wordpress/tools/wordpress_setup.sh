@@ -13,17 +13,17 @@ echo "Database is ready!"
 echo "Downloading WordPress..."
 if [ ! -f /var/www/html/wp-config.php ]; then
     cd /var/www/html
-    
+
     # Download WordPress core files
     curl -O https://wordpress.org/latest.tar.gz
     tar -xzf latest.tar.gz --strip-components=1
     rm latest.tar.gz
-    
+
     # Download WP-CLI with a more reliable method
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
     chmod +x wp-cli.phar
     mv wp-cli.phar /usr/local/bin/wp
-    
+
     # Create wp-config.php
     echo "Creating wp-config.php..."
     wp config create --dbname="$WORDPRESS_DB_NAME" \
@@ -31,23 +31,23 @@ if [ ! -f /var/www/html/wp-config.php ]; then
                      --dbpass="$WORDPRESS_DB_PASSWORD" \
                      --dbhost="$WORDPRESS_DB_HOST" \
                      --allow-root
-    
+
     # Install WordPress
     echo "Installing WordPress..."
-    wp core install --url="$DOMAIN_NAME" \
-                    --title="$WP_TITLE" \
-                    --admin_user="$WP_ADMIN_USER" \
-                    --admin_password="$WP_ADMIN_PASSWORD" \
-                    --admin_email="$WP_ADMIN_EMAIL" \
+    wp core install --url="$WORDPRESS_URL" \
+                    --title="$WORDPRESS_TITLE" \
+                    --admin_user="$WORDPRESS_ADMIN_USER" \
+                    --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
+                    --admin_email="$WORDPRESS_ADMIN_EMAIL" \
                     --allow-root
-    
+
     # Create additional user
     echo "Creating additional user..."
-    wp user create "$WP_USER" "$WP_USER_EMAIL" \
-                   --user_pass="$WP_USER_PASSWORD" \
+    wp user create "$WORDPRESS_USER" "$WORDPRESS_USER_EMAIL" \
+                   --user_pass="$WORDPRESS_USER_PASSWORD" \
                    --role=editor \
                    --allow-root
-    
+
     echo "WordPress installation completed!"
 fi
 
@@ -55,4 +55,4 @@ fi
 chown -R www-data:www-data /var/www/html
 
 echo "Starting PHP-FPM..."
-exec php-fpm7.4 -F
+exec php-fpm8.2 -F
