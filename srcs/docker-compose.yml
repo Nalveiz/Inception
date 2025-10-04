@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   mariadb:
-    build: ./mariadb
+    build: ./requirements/mariadb
     container_name: mariadb
     restart: always
     env_file:
@@ -11,20 +9,13 @@ services:
       - mariadb_data:/var/lib/mysql
     networks:
       - inception_network
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -uroot -p$MYSQL_ROOT_PASSWORD --silent"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
 
   wordpress:
-    build: ./wordpress
+    build: ./requirements/wordpress
     container_name: wordpress
     restart: always
     depends_on:
-      mariadb:
-        condition: service_healthy
+      - mariadb
     env_file:
       - .env
     volumes:
@@ -33,7 +24,7 @@ services:
       - inception_network
 
   nginx:
-    build: ./nginx
+    build: ./requirements/nginx
     container_name: nginx
     restart: always
     depends_on:

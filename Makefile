@@ -16,14 +16,18 @@ down:
 	@echo "Stopping containers..."
 	@$(COMPOSE) down
 
+logs:
+	@$(COMPOSE) logs -f
+
+
 clean: down
 	@echo "Cleaning Docker system..."
-	@sudo docker system prune -af
-	@sudo docker volume prune -f
+	@doas docker system prune -af
+	@doas docker volume prune -f
 
 fclean: clean
 	@echo "Removing all host data..."
-	@sudo rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress || true
+	@doas rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress || true
 
 purge:
 	@echo "🚨 Purging ALL Docker containers, volumes, networks, and images..."
